@@ -10,3 +10,5 @@ export type IConvertedImg = {
 	src: IUrl
 	previewUrl: IUrl
 }
+
+export type FN<I extends unknown[] = [], O = void> = (...args: I) => O

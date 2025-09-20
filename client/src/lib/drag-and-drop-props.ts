@@ -1,5 +1,6 @@
+import type {FN} from './types'
+
 type IDragEvent<E extends HTMLElement> = React.DragEvent<E>
-type FN<I extends unknown[] = [], O = void> = (...args: I) => O
 type IProps = {dragging: boolean; setDragging: FN<[boolean]>; setFiles: FN<[File[]]>}
 
 export const getDragAndDropProps = <E extends HTMLElement>({
