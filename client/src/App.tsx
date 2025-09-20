@@ -1,5 +1,8 @@
 import {useEffect, useRef, useState} from 'react'
 import {ROUTES} from '../../shared/routes'
+
+import {FindAndReplace} from './components/find-and-replace'
+
 import {CONFIG_IMG_TEMPLATE, DEFAULT_CONFIG, validateConfig} from './lib/config'
 import {type IConfig, type ICssQuery, type ICssRules} from './lib/config'
 import {getDragAndDropProps} from './lib/drag-and-drop-props'
@@ -148,73 +151,11 @@ function App() {
 				<li>Need at least one Image Text CSS Query.</li>
 			</ul>
 
-			{config.img.concat([CONFIG_IMG_TEMPLATE]).map((replacementText, i) => {
-				const updateReplacementText = (replacementText: IConfig['img'][number]) => {
-					if (replacementText.alt || replacementText.content)
-						return setText2convert(
-							Object.assign(config.img.slice(), {[i]: replacementText})
-						)
-
-					// remove array item
-					const newArray = config.img.slice()
-
-					newArray.splice(i, 1)
-
-					setText2convert(newArray)
-				}
-
-				const setAlt = (alt: string) => updateReplacementText({...replacementText, alt})
-
-				const setClass = (className: string) =>
-					updateReplacementText({...replacementText, class: className})
-
-				const setContent = (content: string) =>
-					updateReplacementText({...replacementText, content})
-
-				return (
-					<fieldset key={i}>
-						<legend>Replacement Group {i + 1}</legend>
-						<ul
-							data-validation="error"
-							hidden={!replacementValidationErrors[i]?.length}
-						>
-							{replacementValidationErrors[i]?.map((error, i) => (
-								<li key={i}>{error}</li>
-							))}
-						</ul>
-						<label>
-							Image Text:
-							<input
-								name={`image-text-${i}`}
-								onChange={event => setContent(event.currentTarget.value)}
-								placeholder="CSS Query"
-								type="text"
-								value={replacementText.content}
-							/>
-						</label>
-						<label>
-							Alt Text:
-							<input
-								name={`alt-text-${i}`}
-								onChange={event => setAlt(event.currentTarget.value)}
-								type="text"
-								value={replacementText.alt}
-							/>
-						</label>
-						(Optional)
-						<label>
-							Image Class:
-							<input
-								name={`image-class-${i}`}
-								onChange={event => setClass(event.currentTarget.value)}
-								type="text"
-								value={replacementText.class}
-							/>
-						</label>
-						(Optional)
-					</fieldset>
-				)
-			})}
+			<FindAndReplace
+				setState={setText2convert}
+				state={config.img.concat([CONFIG_IMG_TEMPLATE])}
+				validationErrors={replacementValidationErrors}
+			/>
 
 			<label htmlFor="pre-css">Custom Pre CSS</label>
 			<textarea
