@@ -6,27 +6,13 @@ import https from 'https'
 import mime from 'mime-types'
 import multer from 'multer'
 import path from 'path'
-import {z} from 'zod'
 
 import {ROUTES} from '../shared/routes.ts'
 import {setupDownloadEbook} from './routes/download-ebook.ts'
 import {setupUploadEbook} from './routes/upload-ebook.ts'
+import {setupUploadFiles} from './routes/upload-files.ts'
 
 dotenv.config()
-
-const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB (max epub file size)
-
-const FilesUploadSchema = z
-	.object({
-		fieldname: z.string(),
-		originalname: z.string(),
-		encoding: z.string(),
-		mimetype: z.string(),
-		size: z.number(),
-		buffer: z.instanceof(Buffer),
-	})
-	.refine(obj => obj.size <= MAX_FILE_SIZE, {message: 'File size should not exceed 100MB'})
-// .transform(obj => new File([obj.buffer as BlobPart], obj.originalname, {type: obj.mimetype}))
 
 const app = express()
 const options = {
@@ -47,40 +33,7 @@ app.use((req, _, next) => {
 })
 
 setupUploadEbook({app, route: ROUTES.uploadEbook, state, upload})
-
-app.post(ROUTES.uploadFiles, upload.array('files'), async (req, res) => {
-	if (!state.zip) return res.status(428).json({error: 'Upload an eBook first.'})
-
-	const validationResult = z.array(FilesUploadSchema).safeParse(req.files)
-	if (!validationResult.success)
-		return res.status(400).json({
-			error: 'Invalid file(s) uploaded.',
-			details: validationResult.error.flatten().fieldErrors,
-		})
-
-	const files = validationResult.data
-	const newFileNames = files.map(file => file.originalname)
-	const oldFileNames = state.zip
-		.getEntries()
-		.map(entry => entry.entryName.split('/').slice(-1)[0])
-
-	newFileNames.map((newFileName, newFileI) => {
-		const {buffer} = files[newFileI]
-		const oldEntryI = oldFileNames.indexOf(newFileName)
-
-		// insert file
-		if (oldEntryI === -1)
-			return void state.zip!.addFile(`OEBPS/${state.assetDir}${newFileName}`, buffer)
-
-		// update file
-		const fullPath = state.zip!.getEntries()[oldEntryI].entryName
-
-		state.zip!.updateFile(fullPath, buffer)
-	})
-
-	res.status(200).json({filesUpdated: true})
-})
-
+setupUploadFiles({app, route: ROUTES.uploadFiles, state, upload})
 setupDownloadEbook({app, route: ROUTES.downloadEbook, state})
 
 /** @note server index.html */
