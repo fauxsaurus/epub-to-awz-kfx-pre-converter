@@ -4,7 +4,7 @@ import {z} from 'zod'
 import {type IConfig, type IReq, type IRes} from './types.ts'
 
 const EPUB_MIMETYPE = 'application/epub+zip'
-const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB (max epub file size)
+const MAX_EPUB_SIZE = 100 * 1024 * 1024 // 100MB (per the spec)
 
 export const setupUploadEbook = (config: IConfig & {upload: multer.Multer}) =>
 	config.app.post(config.route, config.upload.single('files'), async (req: IReq, res: IRes) => {
@@ -58,5 +58,5 @@ const EbookUploadSchema = z
 	.refine(obj => [EPUB_MIMETYPE, 'application/octet-stream'].includes(obj.mimetype), {
 		message: 'Invalid file type.',
 	})
-	.refine(obj => obj.size <= MAX_FILE_SIZE, {message: 'File size should not exceed 100MB'})
+	.refine(obj => obj.size <= MAX_EPUB_SIZE, {message: 'File size should not exceed 100MB'})
 	.transform(obj => new File([obj.buffer as BlobPart], obj.originalname, {type: obj.mimetype}))
