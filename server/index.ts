@@ -10,27 +10,11 @@ import {z} from 'zod'
 
 import {ROUTES} from '../shared/routes.ts'
 import {setupDownloadEbook} from './routes/download-ebook.ts'
+import {setupUploadEbook} from './routes/upload-ebook.ts'
 
 dotenv.config()
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024 // 100MB (max epub file size)
-
-const EPUB_MIMETYPE = 'application/epub+zip'
-
-const EbookUploadSchema = z
-	.object({
-		fieldname: z.string(),
-		originalname: z.string(),
-		encoding: z.string(),
-		mimetype: z.string(),
-		size: z.number(),
-		buffer: z.instanceof(Buffer),
-	})
-	.refine(obj => [EPUB_MIMETYPE, 'application/octet-stream'].includes(obj.mimetype), {
-		message: 'Invalid file type.',
-	})
-	.refine(obj => obj.size <= MAX_FILE_SIZE, {message: 'File size should not exceed 100MB'})
-	.transform(obj => new File([obj.buffer as BlobPart], obj.originalname, {type: obj.mimetype}))
 
 const FilesUploadSchema = z
 	.object({
@@ -62,43 +46,7 @@ app.use((req, _, next) => {
 	next()
 })
 
-app.post(ROUTES.uploadEbook, upload.single('files'), async (req: Request, res: Response) => {
-	const validationResult = EbookUploadSchema.safeParse(req.file)
-
-	if (!validationResult.success)
-		return res.status(400).json({
-			error: 'Invalid file uploaded.',
-			details: validationResult.error.flatten().fieldErrors,
-		})
-
-	const file = validationResult.data
-
-	state.zip = new AdmZip(Buffer.from(await file.arrayBuffer()))
-
-	const [files, dirs] = state.zip
-		.getEntries()
-		.reduce(
-			(lrFilter, entry) => (
-				lrFilter[entry.isDirectory ? 1 : 0].push(entry.entryName), lrFilter
-			),
-			[[], []] as [string[], string[]]
-		)
-
-	// set asset directory (ensuring that it is a unique name that does not exist in the epub)
-	let i = 0
-	const getAssetDir = () => `kindle-accessible${i ? `-${i}` : ''}/`
-	while (dirs.includes('OEBPS/' + getAssetDir())) i += 1
-	state.assetDir = getAssetDir()
-
-	// return data
-	const htmlFiles = files.filter(file => file.endsWith('html'))
-	if (htmlFiles.length) return res.status(200).json({assetDir: state.assetDir, files: htmlFiles})
-
-	res.status(500).json({
-		error: 'Did not find any text files.',
-		debug: {filePaths: state.zip.getEntries().map(entry => entry.entryName)},
-	})
-})
+setupUploadEbook({app, route: ROUTES.uploadEbook, state, upload})
 
 app.post(ROUTES.uploadFiles, upload.array('files'), async (req, res) => {
 	if (!state.zip) return res.status(428).json({error: 'Upload an eBook first.'})
