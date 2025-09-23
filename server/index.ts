@@ -9,6 +9,7 @@ import path from 'path'
 import {z} from 'zod'
 
 import {ROUTES} from '../shared/routes.ts'
+import {setupDownloadEbook} from './routes/download-ebook.ts'
 
 dotenv.config()
 
@@ -132,18 +133,7 @@ app.post(ROUTES.uploadFiles, upload.array('files'), async (req, res) => {
 	res.status(200).json({filesUpdated: true})
 })
 
-app.get(ROUTES.downloadEbook, async (_, res) => {
-	if (!state.zip) return res.status(404)
-
-	const downloadName = 'kindle-accessible.epub'
-	const buffer = state.zip.toBuffer()
-
-	res.set('Content-Type', EPUB_MIMETYPE)
-	res.set('Content-Disposition', `attachment; filename=${downloadName}`)
-	res.set('Content-Length', buffer.byteLength + '')
-
-	res.send(buffer)
-})
+setupDownloadEbook({app, route: ROUTES.downloadEbook, state})
 
 /** @note server index.html */
 app.get('/', (_, res) =>
