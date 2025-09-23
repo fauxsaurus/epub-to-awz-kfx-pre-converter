@@ -1,4 +1,4 @@
-import type {FN} from './types'
+import type {FN} from '../../../shared/types'
 
 type IDragEvent<E extends HTMLElement> = React.DragEvent<E>
 type IProps = {dragging: boolean; setDragging: FN<[boolean]>; setFiles: FN<[File[]]>}

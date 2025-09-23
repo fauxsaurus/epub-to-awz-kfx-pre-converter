@@ -1,4 +1,4 @@
-import type {FN} from '../../lib/types'
+import type {FN} from '../../../../shared/types.ts'
 
 type IInputProps = {
 	label: string

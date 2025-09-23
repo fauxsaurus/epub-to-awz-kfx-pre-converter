@@ -1,5 +1,5 @@
+import type {FN} from '../../../../shared/types.ts'
 import {type IConfig} from '../../lib/config'
-import type {FN} from '../../lib/types'
 import {TextInput} from './text-input'
 
 type Int = number
