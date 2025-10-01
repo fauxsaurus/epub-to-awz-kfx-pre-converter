@@ -10,7 +10,7 @@ mkdir -p tmp/build/
 # setup files
 cd tmp/src/
 printf "%s" "application/epub+zip" > mimetype
-printf "%s\n" "<!DOCTYPE html><span class=img-text>...</span><span hidden>alt</span>" > index.html
+printf "%s\n" "<!DOCTYPE html><span class=img-text>...</span><span hidden>alt</span>" > chapter-1.html
 
 ## setup epub file
 ### create an uncompressed file with no metadata as the first entry

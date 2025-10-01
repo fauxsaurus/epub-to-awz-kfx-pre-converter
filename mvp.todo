@@ -65,8 +65,17 @@
 		[x] give an option to clear images (and revoke the blob URLs when doing so)
 		[x] Add labels derived from a change in file paths (constantly checking for a difference in the chapter name in the url) between images to show what chapter are in order by extracting the chapter name from the file.
 		[x] alphabetized image file conversion order (80:20, not parsing potentially non-existent file)
+	[] Add testing
+		[x] setup jest
+		[x] setup code coverage
+		[x] test ebook uploading
+			[x] create a valid ebook
+		[] test file uploading
+		[x] test ebook downloading (unaltered)
+		[x] text downloading ebook html file
+		[] test ebook downloading (altered)
+			[] test accessible url paths are useable (i.e., no ../accessible-kindle if the html file is on the same level as that directory)
 	[] improve UI
-		[] +reset button
 		[] Show encountered errors for all HTTP requests in the UI!
 		[] cleanup the internals
 		[] prettify the externals
@@ -74,6 +83,7 @@
 	[] default to HTTP with a warning if those HTTPS envars/files aren't found.
 	[] encourage users to validate the epub (beyond the scope of this 80:20 project)
 	[] auto focus the convert button after drag and drop (CODE IS NOT WORKING...)
+	[] +reset form button
 [] Optional
 	[] Allow users to specify the output image resolution (currently defaults to setting the <iframe> to 1000--roughly the width of many kindles--and then allowing the elements to replace to take up as much space as is natural under that constraint)
 	[] adjust jpg quality

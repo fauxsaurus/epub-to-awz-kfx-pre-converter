@@ -7,6 +7,7 @@ import {setupServer} from './setupServer'
 
 const PORT = 3000
 const baseUrl = `http://localhost:${PORT}`
+const htmlFileName = 'chapter-1.html'
 
 describe('Test Routes', () => {
 	const cleanup = setupServer({logger: console.log, port: PORT, state: {assetDir: ''}})
@@ -32,15 +33,20 @@ describe('Test Routes', () => {
 			['test-ebook.epub', uploadedEbookBlob],
 		])
 		expect(responseUploadEbook).toEqual({
-			data: {assetDir: 'kindle-accessible/', files: ['index.html']},
+			data: {assetDir: 'kindle-accessible/', files: [htmlFileName]},
 			errors: [],
 		})
 
 		/** @note download unaltered ebook */
 		const responseDownloadEbook = await getFile(baseUrl + ROUTES.downloadEbook)
 		const downloadedEbookBlob = await responseDownloadEbook.data?.blob()
-
 		expect(downloadedEbookBlob?.size).toBe(uploadedEbookBlob.size)
+
+		/** @note download html file */
+		const downloadedHTML = await (await getFile(baseUrl + `/${htmlFileName}`)).data?.text()
+		const rawFileContents = await promises.readFile(`./tmp/src/${htmlFileName}`, 'utf-8')
+		console.log({downloadedHTML, rawFileContents})
+		expect(downloadedHTML).toBe(rawFileContents)
 
 		setTimeout(() => cleanup(), 0)
 	})
