@@ -1,11 +1,12 @@
 import {exec} from 'child_process'
 import {promises} from 'fs'
-import {uploadFiles} from '../client/src/lib/request'
+import {getFile, uploadFiles} from '../client/src/lib/request'
 import {ROUTES} from '../shared/routes'
 import {EPUB_MIMETYPE} from '../shared/mimetype'
 import {setupServer} from './setupServer'
 
 const PORT = 3000
+const baseUrl = `http://localhost:${PORT}`
 
 describe('Test Routes', () => {
 	const cleanup = setupServer({logger: console.log, port: PORT, state: {assetDir: ''}})
@@ -24,14 +25,22 @@ describe('Test Routes', () => {
 		})
 
 		const buffer = await promises.readFile('./tmp/build/test.epub')
-		const blob = new Blob([buffer as BlobPart], {type: EPUB_MIMETYPE})
+		const uploadedEbookBlob = new Blob([buffer as BlobPart], {type: EPUB_MIMETYPE})
 
-		const url = `http://localhost:${PORT}${ROUTES.uploadEbook}`
-		const responseUploadEbook = await uploadFiles(url, {}, [['test-ebook.epub', blob]])
+		/** @note TEST upload ebook */
+		const responseUploadEbook = await uploadFiles(baseUrl + ROUTES.uploadEbook, {}, [
+			['test-ebook.epub', uploadedEbookBlob],
+		])
 		expect(responseUploadEbook).toEqual({
 			data: {assetDir: 'kindle-accessible/', files: ['index.html']},
 			errors: [],
 		})
+
+		/** @note download unaltered ebook */
+		const responseDownloadEbook = await getFile(baseUrl + ROUTES.downloadEbook)
+		const downloadedEbookBlob = await responseDownloadEbook.data?.blob()
+
+		expect(downloadedEbookBlob?.size).toBe(uploadedEbookBlob.size)
 
 		setTimeout(() => cleanup(), 0)
 	})
