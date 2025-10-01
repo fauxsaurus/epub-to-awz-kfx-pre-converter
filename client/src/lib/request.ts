@@ -14,7 +14,7 @@ export const getFile = (url: IUrl): Promise<{data?: Response; errors: string[]}>
 		})
 
 export const uploadFiles = async <T>(
-	path: string,
+	url: string,
 	fallback: T,
 	files: [IFileName, Blob | File][]
 ): Promise<{data: T; errors: string[]}> => {
@@ -22,7 +22,7 @@ export const uploadFiles = async <T>(
 
 	files.forEach(([name, blob]) => body.append('files', blob, name))
 
-	return fetch(window.location.origin + path, {method: 'POST', body})
+	return fetch(url, {method: 'POST', body})
 		.then(async response => {
 			if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
 

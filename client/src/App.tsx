@@ -72,7 +72,11 @@ function App() {
 			...convertedImgs.map(imgData => [imgData.src, imgData.blob] as [IFileName, Blob]),
 		]
 
-		uploadFiles<{filesUpdated?: boolean}>(ROUTES.uploadFiles, {}, files).then(async result => {
+		uploadFiles<{filesUpdated?: boolean}>(
+			window.location.origin + ROUTES.uploadFiles,
+			{},
+			files
+		).then(async result => {
 			if (!result.data.filesUpdated) throw new Error('Ebook files not updated on server!')
 
 			const {data, errors} = await getFile(ROUTES.downloadEbook)
@@ -98,7 +102,9 @@ function App() {
 		if (!oldEbook) return // @todo add error, but this shouldn't happen due to disabled.
 
 		const fallback = {assetDir: '', files: []}
-		const res = await uploadFiles(ROUTES.uploadEbook, fallback, [[oldEbook.name, oldEbook]])
+		const res = await uploadFiles(window.location.origin + ROUTES.uploadEbook, fallback, [
+			[oldEbook.name, oldEbook],
+		])
 
 		setAssetDir(res.data.assetDir)
 		setFiles2convert(res.data.files.sort())
