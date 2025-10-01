@@ -24,6 +24,7 @@ export const setupServer = ({cert, key, logger, port, state}: IParam) => {
 	const upload = multer({storage: multer.memoryStorage()})
 
 	const secure = cert && key
+	const protocol = secure ? 'https' : 'http'
 	const server = secure ? https.createServer({cert, key}, app) : http.createServer({}, app)
 
 	setupLogger({app, logger})
@@ -32,7 +33,9 @@ export const setupServer = ({cert, key, logger, port, state}: IParam) => {
 	setupDownloadEbook({app, route: ROUTES.downloadEbook, state})
 	setupFileRouting({app, state})
 
-	server.listen(port, '0.0.0.0', () => logger(`Server is listening on https://localhost:${port}`))
+	server.listen(port, '0.0.0.0', () =>
+		logger(`Server is listening on ${protocol}://localhost:${port}`)
+	)
 
 	return () => new Promise((res, rej) => server.close(error => (error ? rej(error) : res(null))))
 }
