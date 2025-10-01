@@ -1,9 +1,9 @@
 import AdmZip from 'adm-zip'
 import multer from 'multer'
 import {z} from 'zod'
+import {EPUB_MIMETYPE} from '../../shared/mimetype.ts'
 import {type IConfig, type IReq, type IRes} from './types.ts'
 
-const EPUB_MIMETYPE = 'application/epub+zip'
 const MAX_EPUB_SIZE = 100 * 1024 * 1024 // 100MB (per the spec)
 
 export const setupUploadEbook = (config: IConfig & {upload: multer.Multer}) =>
