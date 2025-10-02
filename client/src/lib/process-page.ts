@@ -1,4 +1,4 @@
-import type {IConfig} from './config'
+import type {IConfig} from './config/'
 import {el2imgBlob} from './el2img-blob'
 import {getFile} from './request'
 

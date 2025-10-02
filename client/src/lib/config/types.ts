@@ -1,5 +1,3 @@
-import {z} from 'zod'
-
 export type IHtmlClass = string
 export type ICssQuery = string
 export type ICssRules = string
@@ -26,36 +24,3 @@ export type IConfig = {
 		version: number
 	}
 }
-
-const info = `For use with https://github.com/fauxsaurus/epub-to-awz-kfx-pre-converter.`
-
-export const DEFAULT_CONFIG: IConfig = {
-	css: {pre: '', post: ''},
-	img: [],
-	meta: {info, version: 1},
-}
-
-export const CONFIG_IMG_TEMPLATE: IConfig['img'][number] = {
-	alt: '',
-	class: 'kindle-accessible-image',
-	content: '',
-}
-
-export const validateConfig = (json: unknown) => {
-	const validationResult = configSchema.safeParse(json)
-	if (!validationResult.success) return {data: DEFAULT_CONFIG, errors: ['Invalid Config']}
-
-	return {data: validationResult.data, errors: []}
-}
-
-const configSchema = z.object({
-	css: z.object({pre: z.string(), post: z.string()}),
-	img: z.array(
-		z.object({
-			alt: z.string().optional(),
-			class: z.string().optional(),
-			content: z.string(),
-		})
-	),
-	meta: z.object({info: z.string(), version: z.number()}),
-})

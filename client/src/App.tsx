@@ -3,8 +3,8 @@ import {ROUTES} from '../../shared/routes'
 
 import {FindAndReplace} from './components/find-and-replace'
 
-import {CONFIG_IMG_TEMPLATE, DEFAULT_CONFIG, validateConfig} from './lib/config'
-import {type IConfig, type ICssQuery, type ICssRules} from './lib/config'
+import {CONFIG_IMG_TEMPLATE, DEFAULT_CONFIG, validateConfig} from './lib/config/'
+import {type IConfig, type ICssQuery, type ICssRules} from './lib/config/'
 import {getDragAndDropProps} from './lib/drag-and-drop-props'
 import {processPage} from './lib/process-page'
 import {getFile, uploadFiles} from './lib/request'
