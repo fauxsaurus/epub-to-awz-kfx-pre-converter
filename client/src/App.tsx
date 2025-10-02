@@ -2,9 +2,13 @@ import {useEffect, useRef, useState} from 'react'
 import {ROUTES} from '../../shared/routes'
 
 import {FindAndReplace} from './components/find-and-replace'
-
-import {CONFIG_IMG_TEMPLATE, DEFAULT_CONFIG, validateConfig} from './lib/config/'
-import {type IConfig, type ICssQuery, type ICssRules} from './lib/config/'
+import {
+	CONFIG_IMG_TEMPLATE,
+	DEFAULT_CONFIG,
+	validateConfig,
+	validateReplacementConfig,
+} from './lib/config/'
+import {type IConfig, type ICssRules} from './lib/config/'
 import {getDragAndDropProps} from './lib/drag-and-drop-props'
 import {processPage} from './lib/process-page'
 import {getFile, uploadFiles} from './lib/request'
@@ -12,16 +16,6 @@ import type {IConvertedImg, IFileName} from './lib/types'
 import {download} from './lib/download'
 
 import './assets/form.css'
-
-const validateCssQuery = (query: ICssQuery) => {
-	try {
-		document.querySelector(query)
-		return true
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	} catch (_) {
-		return false
-	}
-}
 
 function App() {
 	const [config, setConfig] = useState<IConfig>(DEFAULT_CONFIG)
@@ -45,17 +39,7 @@ function App() {
 	const [updatedHTML, setUpdatedHTML] = useState<Record<IFileName, string>>({})
 
 	const atLeastOneQuery = !!config.img.length
-	const replacementValidationErrors = config.img.map(replacementText => {
-		const validationErrors = []
-
-		if (!replacementText.content || !validateCssQuery(replacementText.content))
-			validationErrors.push('Need a valid CSS query for Image Text.')
-
-		if (replacementText.alt && !validateCssQuery(replacementText.alt))
-			validationErrors.push('Invalid Alt Text CSS Query.')
-
-		return validationErrors
-	})
+	const replacementValidationErrors = validateReplacementConfig(config.img)
 
 	// upload files (when ready) and download new epub
 	useEffect(() => {
