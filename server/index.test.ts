@@ -45,7 +45,6 @@ describe('Test Routes', () => {
 		/** @note download html file */
 		const downloadedHTML = await (await getFile(baseUrl + `/${htmlFileName}`)).data?.text()
 		const rawFileContents = await promises.readFile(`./tmp/src/${htmlFileName}`, 'utf-8')
-		console.log({downloadedHTML, rawFileContents})
 		expect(downloadedHTML).toBe(rawFileContents)
 
 		setTimeout(() => cleanup(), 0)

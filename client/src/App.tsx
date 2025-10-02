@@ -205,9 +205,7 @@ function App() {
 			</button>
 			<button
 				disabled={!convertedImgs.length || !!files2convert.length}
-				onClick={() => {
-					clearPreviewImages()
-				}}
+				onClick={() => clearPreviewImages()}
 			>
 				Clear Images
 			</button>
